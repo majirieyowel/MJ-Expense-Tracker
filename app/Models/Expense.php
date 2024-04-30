@@ -5,7 +5,10 @@ namespace App\Models;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Expense extends Model
 {
@@ -19,6 +22,14 @@ class Expense extends Model
         'updated_at'
     ];
 
+    public static function getByUser(int $number): LengthAwarePaginator
+    {
+        return self::whereUserId(Auth::id())
+            ->orderBy("created_at", "asc")
+            ->with('item')
+            ->paginate($number);
+    }
+
 
     public static function createExpense($data) {
         return self::create([
@@ -27,6 +38,11 @@ class Expense extends Model
             "amount" => $data->amount,
             "expense_date" => $data->date
         ]);
+    }
+
+    public function item(): BelongsTo
+    {
+        return $this->belongsTo(Item::class);
     }
 
     protected static function boot()

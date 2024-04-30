@@ -10,6 +10,14 @@ use Illuminate\Support\Facades\Log;
 
 class ExpenseController extends Controller
 {
+    public function index()
+    {
+
+        $items = Expense::getByUser(50);
+
+        return $this->ok("Expense List", $items);
+    }
+
     public function createExpense(ExpenseRequest $request)
     {
 
