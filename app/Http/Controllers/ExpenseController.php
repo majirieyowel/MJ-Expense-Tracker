@@ -18,7 +18,7 @@ class ExpenseController extends Controller
         return $this->ok("Expense List", $items);
     }
 
-    public function createExpense(ExpenseRequest $request)
+    public function store(ExpenseRequest $request)
     {
 
         $itemId = Item::getId($request->item);
@@ -35,5 +35,18 @@ class ExpenseController extends Controller
         ]);
 
         return $this->ok("Expense saved", $newExpense);
+    }
+
+    public function destroy($expense_uuid) {
+
+        $expense = Expense::getByUuid($expense_uuid);
+
+        if (!$expense) {
+            return $this->error("Expense does not exist", 404);
+        }
+
+        Expense::deleteExpense($expense);
+
+        return $this->ok("Expense deleted");
     }
 }

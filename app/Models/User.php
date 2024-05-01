@@ -74,12 +74,23 @@ class User extends Authenticatable
         return self::whereEmail($email)->first();
     }
 
+    public function setting()
+    {
+        return $this->hasOne(Setting::class);
+    }
+
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($model) {
             $model->uuid = Str::uuid();
+        });
+
+        static::created(function ($user) {
+            $user->setting()->create([
+               "data" => json_encode(["ENABLED_NOTIFICATIONS" => false])
+            ]);
         });
     }
 }

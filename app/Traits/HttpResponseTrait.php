@@ -16,12 +16,9 @@ trait HttpResponseTrait
     {
         $body = [
             'status'  => true,
-            'message' => $message
+            'message' => $message,
+            'date' => $data
         ];
-
-        if (!empty($data)) {
-            $body = array_merge($body, ['data' => $data]);
-        };
 
         return response()->json($body, $status);
     }

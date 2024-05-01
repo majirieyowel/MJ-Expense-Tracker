@@ -14,7 +14,10 @@ return new class extends Migration
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
             $table->uuid();
-            $table->foreignId('user_id')->index();
+            $table->foreignId('user_id')
+                ->index()
+                ->constrained()
+                ->onDelete('cascade');
             $table->foreignId('item_id')->index();
             $table->decimal("amount", 10, 2);
             $table->date("expense_date");

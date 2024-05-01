@@ -25,13 +25,21 @@ class Expense extends Model
     public static function getByUser(int $number): LengthAwarePaginator
     {
         return self::whereUserId(Auth::id())
-            ->orderBy("created_at", "asc")
+            ->orderBy("created_at", "desc")
             ->with('item')
             ->paginate($number);
     }
 
+    public static function getByUuid(string $uuid): ?Expense
+    {
+        return self::where("user_id", Auth::id())
+            ->where("uuid", $uuid)
+            ->first();
+    }
 
-    public static function createExpense($data) {
+
+    public static function createExpense($data)
+    {
         return self::create([
             "user_id" => Auth::id(),
             "item_id" => $data->item_id,
@@ -43,6 +51,11 @@ class Expense extends Model
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
+    }
+
+    public static function deleteExpense(self $expense)
+    {
+        $expense->delete();
     }
 
     protected static function boot()

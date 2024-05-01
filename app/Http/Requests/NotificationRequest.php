@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\ExpenseDateLimit;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ExpenseRequest extends FormRequest
+class NotificationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +22,8 @@ class ExpenseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "item" => "required|string",
-            "amount" => "required|numeric",
-            "date" => ["required", new ExpenseDateLimit]
+            "days" => ["required", "array"],
+            "time" => ["required", "numeric"]
         ];
     }
 }
