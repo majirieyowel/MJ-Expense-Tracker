@@ -17,7 +17,7 @@ trait HttpResponseTrait
         $body = [
             'status'  => true,
             'message' => $message,
-            'date' => $data
+            'data' => $data
         ];
 
         return response()->json($body, $status);

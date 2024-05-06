@@ -55,7 +55,7 @@ class User extends Authenticatable
         return self::create([
             'username' => $data->username,
             'email' => $data->email,
-            'password' => Hash::make("12345678"),
+            'password' => Hash::make($data->password),
             'email_verified_at' => $verified ? now() : null
         ]);
     }

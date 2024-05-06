@@ -1,6 +1,4 @@
 <?php
-
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ItemController;
@@ -8,15 +6,19 @@ use App\Http\Controllers\QueryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\NotificationController;
 
+
 Route::prefix('auth')
     ->controller(AuthController::class)
     ->group(function () {
         Route::post('sign-up', 'signUp');
         Route::post('sign-in', 'signIn');
+        Route::get('me', 'signIn');
     });
 
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('/auth/me', [AuthController::class, 'me']);
 
     // EXPENSES
     Route::prefix('expense')

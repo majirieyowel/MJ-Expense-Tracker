@@ -4,12 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Requests\SignInRequest;
 use App\Http\Requests\SignUpRequest;
+use App\Mail\EmailVerificationMail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
+    public function me(Request $request)
+    {
+
+        return $this->ok("User Created", Auth::user());
+    }
+
     public function signUp(SignUpRequest $request)
     {
 
@@ -21,6 +31,9 @@ class AuthController extends Controller
 
         $userToken = User::signInUser($createdUser);
 
+        // Send email
+        Mail::to($createdUser)->send(new EmailVerificationMail());
+
         $data = [
             "user" => $createdUser,
             "token" => $userToken
@@ -31,8 +44,7 @@ class AuthController extends Controller
 
     public function signIn(SignInRequest $request)
     {
-        sleep(3);
-        
+
         $user = User::getByEmail($request->email);
 
         if (!$user) {
