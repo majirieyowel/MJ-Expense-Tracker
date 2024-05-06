@@ -14,8 +14,7 @@ class AuthController extends Controller
     {
 
         $createdUser = User::signUpUser((object)[
-            'firstname' => $request->firstname,
-            'lastname' => $request->lastname,
+            'username' => $request->username,
             'email' => $request->email,
             'password' => $request->password,
         ]);
@@ -32,6 +31,8 @@ class AuthController extends Controller
 
     public function signIn(SignInRequest $request)
     {
+        sleep(3);
+        
         $user = User::getByEmail($request->email);
 
         if (!$user) {

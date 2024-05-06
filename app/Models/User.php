@@ -20,8 +20,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'firstname',
-        'lastname',
+        'username',
         'email',
         'password',
     ];
@@ -54,8 +53,7 @@ class User extends Authenticatable
     public static function signUpUser($data, $verified = false): User
     {
         return self::create([
-            'firstname' => $data->firstname,
-            'lastname' => $data->lastname,
+            'username' => $data->username,
             'email' => $data->email,
             'password' => Hash::make("12345678"),
             'email_verified_at' => $verified ? now() : null
