@@ -23,9 +23,16 @@ class SignUpRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "username" => "required|string|alpha_num|max:20",
+            "username" => ["required", "string", "regex:/^[a-zA-Z0-9_ ]+$/", "max:20"],
             "email" => "required|email:rfc,dns|unique:users",
             "password" => ["required", Password::min(8)]
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            "username.regex" => "Username can only contain letters, numbers, spaces, or underscores."
         ];
     }
 }

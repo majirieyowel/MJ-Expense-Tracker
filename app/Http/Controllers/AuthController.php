@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use App\Http\Requests\SignInRequest;
 use App\Http\Requests\SignUpRequest;
-use App\Mail\EmailVerificationMail;
+use App\Services\MailgunService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -31,8 +30,16 @@ class AuthController extends Controller
 
         $userToken = User::signInUser($createdUser);
 
-        // Send email
-        Mail::to($createdUser)->send(new EmailVerificationMail());
+        (new MailgunService())->send_with_template("email_verification", [
+            "subject" => "Email Verification",
+            "to" => $request->username ." ". $request->email,
+            "variables" => [
+                "username" => $request->username,
+                "verification_url" => "https://spenda.ng",
+                "email" => $request->email,
+                "contact_url" => "https://spenda.ng"
+            ]
+        ]);
 
         $data = [
             "user" => $createdUser,
