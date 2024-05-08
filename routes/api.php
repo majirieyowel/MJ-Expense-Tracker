@@ -12,6 +12,7 @@ Route::prefix('auth')
     ->group(function () {
         Route::post('sign-up', 'signUp');
         Route::post('sign-in', 'signIn');
+        Route::post('google-oauth', 'GoogleAuth');
         Route::get('me', 'signIn');
     });
 
