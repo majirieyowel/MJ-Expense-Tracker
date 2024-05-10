@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string("template");
             $table->string('email');
-            $table->integer('send_after_ts');
+            $table->unsignedBigInteger('send_after_ts');
             $table->json('data');
             $table->timestamps();
         });

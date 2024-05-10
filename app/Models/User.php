@@ -23,6 +23,7 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
+        'auth_channel'
     ];
 
     /**
@@ -50,9 +51,10 @@ class User extends Authenticatable
         ];
     }
 
-    public static function signUpUser($data, $verified = false): User
+    public static function createUser($data, $verified = false): User
     {
         return self::create([
+            'auth_channel' => $data->auth_channel,
             'username' => $data->username,
             'email' => $data->email,
             'password' => Hash::make($data->password),
@@ -68,7 +70,8 @@ class User extends Authenticatable
         return $token->plainTextToken;
     }
 
-    public static function getByEmail(string $email) {
+    public static function getByEmail(string $email)
+    {
         return self::whereEmail($email)->first();
     }
 
@@ -87,7 +90,7 @@ class User extends Authenticatable
 
         static::created(function ($user) {
             $user->setting()->create([
-               "data" => json_encode(["ENABLED_NOTIFICATIONS" => false])
+                "data" => json_encode(["ENABLED_NOTIFICATIONS" => false])
             ]);
         });
     }

@@ -23,8 +23,7 @@ class AuthController extends Controller
 
     public function signUp(SignUpRequest $request)
     {
-
-        $createdUser = User::signUpUser((object)[
+        $createdUser = User::createUser((object)[
             'username' => $request->username,
             'email' => $request->email,
             'password' => $request->password,
@@ -49,15 +48,15 @@ class AuthController extends Controller
         EmailQueue::create([
             "template" => "welcome",
             "email" => $request->email,
-            "send_after_ts" => now()->addMinutes(2),
-            "data" => [
+            "send_after_ts" => now()->addMinutes(1)->timestamp,
+            "data" => json_encode([
                 "subject" => "Welcome to Spenda",
                 "to" => $request->username . " " . $request->email,
                 "variables" => [
                     "username" => $request->username,
                     "contact_url" => "https://spenda.ng/contact-us"
                 ]
-            ]
+            ])
         ]);
 
         return $this->signInUser($createdUser);
@@ -65,7 +64,6 @@ class AuthController extends Controller
 
     public function signIn(SignInRequest $request)
     {
-
         $user = User::getByEmail($request->email);
 
         if (!$user || !Hash::check($request->password, $user->password)) {
@@ -86,19 +84,33 @@ class AuthController extends Controller
 
                 $email = $payload['email'];
 
-                $user = User::getByEmail($request->email);
+                $user = User::getByEmail($email);
 
                 if ($user) {
                     return $this->signInUser($user);
                 } else {
 
-                    $createdUser = User::signUpUser((object)[
+                    $createdUser = User::createUser((object)[
                         'username' => $payload['name'],
                         'email' => $email,
                         'password' => Str::random(),
                     ], true);
 
-                    // Send welcome email 
+                    // Queue welcome email 
+                    EmailQueue::create([
+                        "template" => "welcome",
+                        "email" => $createdUser->email,
+                        "send_after_ts" => now()->addMinutes(2)->timestamp,
+                        "data" => json_encode([
+                            "subject" => "Welcome to Spenda",
+                            "to" => $createdUser->username . " " . $createdUser->email,
+                            "variables" => [
+                                "username" => $createdUser->username,
+                                "contact_url" => "https://spenda.ng/contact-us"
+                            ]
+                        ])
+                    ]);
+
 
 
                     return $this->signInUser($createdUser);

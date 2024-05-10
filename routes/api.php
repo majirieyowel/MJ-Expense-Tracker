@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ItemController;
@@ -10,9 +11,6 @@ use App\Http\Controllers\NotificationController;
 Route::prefix('auth')
     ->controller(AuthController::class)
     ->group(function () {
-        Route::post('sign-up', 'signUp');
-        Route::post('sign-in', 'signIn');
-        Route::post('google-oauth', 'GoogleAuth');
         Route::get('me', 'signIn');
     });
 
