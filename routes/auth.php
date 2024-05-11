@@ -10,7 +10,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 
 Route::post('/register', [RegisteredUserController::class, 'store'])
-                ->middleware('guest')
+                // ->middleware('guest')
                 ->name('register');
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])
