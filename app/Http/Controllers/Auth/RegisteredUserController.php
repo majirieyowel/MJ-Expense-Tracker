@@ -12,6 +12,7 @@ use App\Http\Requests\SignUpRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\JsonResponse;
 
 class RegisteredUserController extends Controller
 {
@@ -20,7 +21,7 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(SignUpRequest $request): Response
+    public function store(SignUpRequest $request): JsonResponse
     {
         $user = User::createUser((object)[
             'username' => $request->username,
@@ -33,6 +34,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return response()->noContent();
+        return $this->ok("User Created", $user);
     }
 }
