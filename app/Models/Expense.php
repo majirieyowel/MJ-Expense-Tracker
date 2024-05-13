@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,6 +34,15 @@ class Expense extends Model
         return self::where("user_id", Auth::id())
             ->where("uuid", $uuid)
             ->first();
+    }
+
+    public static function getLatestExpenses()
+    {
+        return self::where("user_id", Auth::id())
+            ->with('item')
+            ->orderBy("created_at", "desc")
+            ->take(5)
+            ->get();
     }
 
 

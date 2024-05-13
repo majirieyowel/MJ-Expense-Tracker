@@ -4,15 +4,17 @@ namespace App\Http\Controllers;
 
 use Google\Client;
 use App\Models\User;
+use App\Models\EmailQueue;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Constants\AuthChannel;
 use App\Services\MailgunService;
 use App\Http\Requests\SignInRequest;
 use App\Http\Requests\SignUpRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth\Events\Registered;
 use App\Http\Requests\GoogleAuthRequest;
-use App\Models\EmailQueue;
 
 class AuthController extends Controller
 {
@@ -27,37 +29,10 @@ class AuthController extends Controller
             'username' => $request->username,
             'email' => $request->email,
             'password' => $request->password,
+            'auth_channel' => AuthChannel::PASSWORD
         ]);
 
-        $cacheKey = Str::random(30);
-        $cacheValue = $createdUser->id;
-
-        cache([$cacheKey => $cacheValue], now()->addWeek());
-
-        (new MailgunService())->send_with_template("email_verification", [
-            "subject" => "Email Verification",
-            "to" => $request->username . " " . $request->email,
-            "variables" => [
-                "verification_url" => "https://spenda.ng/verify/{$cacheKey}",
-                "email" => $request->email,
-                "contact_url" => "https://spenda.ng/contact-us"
-            ]
-        ]);
-
-        // Queue welcome email 
-        EmailQueue::create([
-            "template" => "welcome",
-            "email" => $request->email,
-            "send_after_ts" => now()->addMinutes(1)->timestamp,
-            "data" => json_encode([
-                "subject" => "Welcome to Spenda",
-                "to" => $request->username . " " . $request->email,
-                "variables" => [
-                    "username" => $request->username,
-                    "contact_url" => "https://spenda.ng/contact-us"
-                ]
-            ])
-        ]);
+        event(new Registered($createdUser));
 
         return $this->signInUser($createdUser);
     }

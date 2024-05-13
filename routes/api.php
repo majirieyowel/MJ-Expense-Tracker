@@ -11,8 +11,10 @@ use App\Http\Controllers\NotificationController;
 Route::prefix('auth')
     ->controller(AuthController::class)
     ->group(function () {
-        Route::get('me', 'signIn');
+        Route::post('sign-up', 'signUp');
+        Route::post('sign-in', 'signIn');
     });
+
 
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -25,6 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
         ->group(function () {
 
             Route::get('/', 'index');
+            Route::get('top', 'topExpenses');
             Route::post('/', 'store');
             Route::delete('{expense_uuid}', 'destroy');
         });

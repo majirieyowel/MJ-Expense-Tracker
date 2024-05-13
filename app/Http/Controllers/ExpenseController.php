@@ -18,6 +18,28 @@ class ExpenseController extends Controller
         return $this->ok("Expense List", $items);
     }
 
+    public function topExpenses(Request $request)
+    {
+        $topExpenses = Expense::getLatestExpenses();
+
+        $itemsGroup = [];
+
+        foreach ($topExpenses as $expense) {
+            $itemsGroup[$expense->expense_date][] = $this->formatExpense($expense);
+        }
+
+        $formattedItems = [];
+
+        foreach ($itemsGroup as $groupKey => $value) {
+            $innerGroup = [];
+            $innerGroup["key"] = $this->formatGroupKey($groupKey);
+            $innerGroup["values"] = $value;
+            $formattedItems[] = $innerGroup;
+        }
+
+        return $this->ok('Latest expenses', $formattedItems);
+    }
+
     public function store(ExpenseRequest $request)
     {
 
@@ -34,10 +56,11 @@ class ExpenseController extends Controller
             "date" => $request->date
         ]);
 
-        return $this->ok("Expense saved", $newExpense);
+        return $this->ok("Expense saved", $this->formatExpense($newExpense));
     }
 
-    public function destroy($expense_uuid) {
+    public function destroy($expense_uuid)
+    {
 
         $expense = Expense::getByUuid($expense_uuid);
 
@@ -48,5 +71,27 @@ class ExpenseController extends Controller
         Expense::deleteExpense($expense);
 
         return $this->ok("Expense deleted");
+    }
+
+    private function formatGroupKey(String $dateString)
+    {
+
+        $date = new \DateTime($dateString);
+
+        if (now()->format('Y-m-d') === $dateString) {
+            return "Today";
+        };
+
+        return $date->format('jS F Y');
+    }
+
+    private function formatExpense(Expense $expense)
+    {
+        return [
+            'uuid' => $expense->uuid,
+            'item' => $expense->item->title,
+            'amount' => $expense->amount,
+            'date' => $expense->expense_date
+        ];
     }
 }
