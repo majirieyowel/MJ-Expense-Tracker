@@ -40,8 +40,8 @@ class Expense extends Model
     {
         return self::where("user_id", Auth::id())
             ->with('item')
-            ->orderBy("created_at", "desc")
-            ->take(5)
+            ->orderBy("expense_date", "desc")
+            ->take(10)
             ->get();
     }
 

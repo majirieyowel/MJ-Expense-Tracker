@@ -20,25 +20,9 @@ class ExpenseController extends Controller
 
     public function topExpenses(Request $request)
     {
-        $topExpenses = Expense::getLatestExpenses();
-
-        $itemsGroup = [];
-
-        foreach ($topExpenses as $expense) {
-            $itemsGroup[$expense->expense_date][] = $this->formatExpense($expense);
-        }
-
-        $formattedItems = [];
-
-        foreach ($itemsGroup as $groupKey => $value) {
-            $innerGroup = [];
-            $innerGroup["key"] = $this->formatGroupKey($groupKey);
-            $innerGroup["values"] = $value;
-            $formattedItems[] = $innerGroup;
-        }
-
-        return $this->ok('Latest expenses', $formattedItems);
+        return $this->getTopExpenses();
     }
+
 
     public function store(ExpenseRequest $request)
     {
@@ -50,13 +34,13 @@ class ExpenseController extends Controller
             return $this->error("Unable to save expense at the moment");
         }
 
-        $newExpense = Expense::createExpense((object) [
+        Expense::createExpense((object) [
             "item_id" => $itemId,
             "amount" => $request->amount,
             "date" => $request->date
         ]);
 
-        return $this->ok("Expense saved", $this->formatExpense($newExpense));
+        return $this->getTopExpenses();
     }
 
     public function destroy($expense_uuid)
@@ -89,9 +73,31 @@ class ExpenseController extends Controller
     {
         return [
             'uuid' => $expense->uuid,
-            'item' => $expense->item->title,
+            'item' => $expense->item?->title,
             'amount' => $expense->amount,
             'date' => $expense->expense_date
         ];
+    }
+
+    private function getTopExpenses()
+    {
+        $topExpenses = Expense::getLatestExpenses();
+
+        $itemsGroup = [];
+
+        foreach ($topExpenses as $expense) {
+            $itemsGroup[$expense->expense_date][] = $this->formatExpense($expense);
+        }
+
+        $formattedItems = [];
+
+        foreach ($itemsGroup as $groupKey => $value) {
+            $innerGroup = [];
+            $innerGroup["key"] = $this->formatGroupKey($groupKey);
+            $innerGroup["values"] = $value;
+            $formattedItems[] = $innerGroup;
+        }
+
+        return $this->ok('Latest expenses', $formattedItems);
     }
 }

@@ -24,7 +24,7 @@ class ExpenseRequest extends FormRequest
     {
         return [
             "item" => "required|string",
-            "amount" => "required|numeric",
+            "amount" => "required|numeric|gt:0",
             "date" => ["required", new ExpenseDateLimit]
         ];
     }

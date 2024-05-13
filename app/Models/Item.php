@@ -24,26 +24,23 @@ class Item extends Model
 
     public static function getId(string $item): ?int
     {
+        $existingItem = null;
 
         if (Utils::isValidUuid($item)) {
-
             $existingItem = self::whereUuid($item)->first();
-
-            if (!$existingItem) {
-
-                return null;
-            }
-
-            return $existingItem->id;
         } else {
-
-            $item = self::firstOrCreate([
-                'user_id' => Auth::id(),
-                'title' => $item
-            ])->first();
-
-            return $item->id;
+            $existingItem = self::where('user_id', Auth::id())->where('title', $item)->first();
         }
+
+        if ($existingItem) {
+            return $existingItem->id;
+        }
+
+        // If the item does not exist, create a new one
+        return self::create([
+            'user_id' => Auth::id(),
+            'title' => Utils::isValidUuid($item) ? null : $item
+        ])->id;
     }
 
     public static function getByUser(int $number): LengthAwarePaginator
