@@ -19,7 +19,7 @@ return new class extends Migration
                 ->constrained()
                 ->onDelete('cascade');
             $table->foreignId('item_id')->index();
-            $table->decimal("amount", 10, 2);
+            $table->decimal("amount", 12, 2);
             $table->date("expense_date");
             $table->timestamps();
         });

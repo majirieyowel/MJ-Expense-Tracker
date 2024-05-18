@@ -8,7 +8,6 @@ use App\Models\EmailQueue;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Constants\AuthChannel;
-use App\Services\MailgunService;
 use App\Http\Requests\SignInRequest;
 use App\Http\Requests\SignUpRequest;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +19,13 @@ class AuthController extends Controller
 {
     public function me(Request $request)
     {
-        return $this->ok("Current user", Auth::user());
+        $user = Auth::user();
+
+        $user->notification = User::withNotification($user);
+
+        unset($user->notifications);
+
+        return $this->ok("Current user", $user);
     }
 
     public function signUp(SignUpRequest $request)
@@ -101,6 +106,9 @@ class AuthController extends Controller
 
     private function signInUser(User $user)
     {
+        $user->notification = User::withNotification($user);
+
+        unset($user->notifications);
 
         $userToken = User::signInUser($user);
 

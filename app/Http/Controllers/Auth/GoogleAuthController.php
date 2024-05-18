@@ -17,7 +17,7 @@ class GoogleAuthController extends Controller
     {
         try {
 
-            $client = new Client(['client_id' => $request->client_id]);
+            $client = new Client(['client_id' => config('services.google.client_id')]);
             $payload = $client->verifyIdToken($request->credential);
 
             if ($payload) {

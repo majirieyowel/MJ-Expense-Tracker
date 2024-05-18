@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -62,6 +63,11 @@ class User extends Authenticatable
         ]);
     }
 
+    public static function getByWhatsappMsisdn(string $msisdn): ?self
+    {
+        return self::where('whatsapp_msisdn', $msisdn)->first();
+    }
+
 
     public static function signInUser(self $user): string
     {
@@ -73,6 +79,26 @@ class User extends Authenticatable
     public static function getByEmail(string $email)
     {
         return self::whereEmail($email)->first();
+    }
+
+    public static function withNotification(self $user): array
+    {
+        $data = [
+            'days' => [],
+            'time' => ''
+        ];
+
+        foreach ($user->notifications as $notification) {
+            $data['days'][] = $notification->day;
+            $data['time'] = $notification->time;
+        }
+
+        return $data;
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
     }
 
     public function setting()

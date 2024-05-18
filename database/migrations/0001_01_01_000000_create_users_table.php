@@ -19,6 +19,10 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('auth_channel');
+            $table->string('currency')->default("NGN");
+            $table->string('currency_symbol')->default("₦");
+            $table->string('whatsapp_msisdn')->nullable();
+            $table->dateTime('whatsapp_msisdn_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

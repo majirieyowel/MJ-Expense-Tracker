@@ -22,8 +22,8 @@ class NotificationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "days" => ["required", "array"],
-            "time" => ["required", "numeric"]
+            "days" => ["nullable", "array"],
+            "time" => ["nullable", "numeric"]
         ];
     }
 }

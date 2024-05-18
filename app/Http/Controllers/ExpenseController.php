@@ -3,19 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Models\Item;
-use Illuminate\Http\Request;
-use App\Http\Requests\ExpenseRequest;
 use App\Models\Expense;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+use App\Services\ExpenseService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\ExpenseRequest;
 
 class ExpenseController extends Controller
 {
-    public function index()
+    public function __construct(protected ExpenseService $expenseService)
     {
+    }
 
+    public function index(): JsonResponse
+    {
         $items = Expense::getByUser(50);
 
         return $this->ok("Expense List", $items);
+    }
+
+
+    public function summary(): JsonResponse
+    {
+        return $this->ok("Expense summary", $this->expenseService->summary(auth()->id()));
     }
 
     public function topExpenses(Request $request)
@@ -27,20 +38,9 @@ class ExpenseController extends Controller
     public function store(ExpenseRequest $request)
     {
 
-        $itemId = Item::getId($request->item);
+        [$status, $output, $errorCode] = $this->expenseService->store($request->item, $request->amount, $request->date, Auth::id());
 
-        if (!$itemId) {
-            Log::error("invalid item id used");
-            return $this->error("Unable to save expense at the moment");
-        }
-
-        Expense::createExpense((object) [
-            "item_id" => $itemId,
-            "amount" => $request->amount,
-            "date" => $request->date
-        ]);
-
-        return $this->getTopExpenses();
+        return $status ? $this->getTopExpenses() : $this->error($output, $errorCode);
     }
 
     public function destroy($expense_uuid)
@@ -72,6 +72,7 @@ class ExpenseController extends Controller
     private function formatExpense(Expense $expense)
     {
         return [
+            'index' => $expense->id,
             'uuid' => $expense->uuid,
             'item' => $expense->item?->title,
             'amount' => $expense->amount,
@@ -92,12 +93,37 @@ class ExpenseController extends Controller
         $formattedItems = [];
 
         foreach ($itemsGroup as $groupKey => $value) {
+
+
+
             $innerGroup = [];
             $innerGroup["key"] = $this->formatGroupKey($groupKey);
-            $innerGroup["values"] = $value;
+            $innerGroup["values"] = $this->sortByIndex($value);
             $formattedItems[] = $innerGroup;
         }
 
         return $this->ok('Latest expenses', $formattedItems);
+    }
+
+    public function sortByIndex($array)
+    {
+        // Extract the "index" column for sorting
+        $indexes = array_column($array, 'index');
+
+        // Sort the indexes in descending order
+        rsort($indexes);
+
+        // Reorder the original array based on the sorted indexes
+        $sortedArray = [];
+        foreach ($indexes as $index) {
+            foreach ($array as $item) {
+                if ($item['index'] === $index) {
+                    $sortedArray[] = $item;
+                    break;
+                }
+            }
+        }
+
+        return $sortedArray;
     }
 }

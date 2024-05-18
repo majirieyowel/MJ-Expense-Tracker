@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Item extends Model
 {
@@ -21,15 +22,20 @@ class Item extends Model
         'updated_at'
     ];
 
+    public function recentPrices(): HasMany
+    {
+        return $this->hasMany(Expense::class)->orderBy('amount', 'desc')->take(10);
+    }
 
-    public static function getId(string $item): ?int
+
+    public static function getId(string $item, int $user_id): ?int
     {
         $existingItem = null;
 
         if (Utils::isValidUuid($item)) {
             $existingItem = self::whereUuid($item)->first();
         } else {
-            $existingItem = self::where('user_id', Auth::id())->where('title', $item)->first();
+            $existingItem = self::where('user_id', $user_id)->where('title', $item)->first();
         }
 
         if ($existingItem) {
@@ -38,7 +44,7 @@ class Item extends Model
 
         // If the item does not exist, create a new one
         return self::create([
-            'user_id' => Auth::id(),
+            'user_id' => $user_id,
             'title' => Utils::isValidUuid($item) ? null : $item
         ])->id;
     }
@@ -61,8 +67,9 @@ class Item extends Model
     {
         return self::where('title', 'like', '%' . $query . '%')
             ->where('user_id', Auth::id())
-            ->select(['uuid', 'title'])
-            ->take(10)
+            // ->select(['uuid', 'title'])
+            ->with('recentPrices')
+            ->take(4)
             ->get();
     }
 

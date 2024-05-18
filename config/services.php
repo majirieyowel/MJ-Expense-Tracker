@@ -34,9 +34,18 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'google' => [
+        'client_id' =>  env('GOOGLE_CLIENT_ID'),
+    ],
     'mailgun' => [
         'key' =>  env('MAILGUN_API_KEY'),
         'domain' =>  env('MAILGUN_API_DOMAIN')
+    ],
+    'meta' => [
+        'verify_token' => env('META_WEBHOOK_VERIFY_TOKEN'),
+        'api_token' => env('META_GRAPH_API_TOKEN'),
+        'phone_number_id' => env('META_PHONE_NUMBER_ID'),
+        'whatsapp_number' => env("META_WHATSAPP_NUMBER")
     ]
 
 ];

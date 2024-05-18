@@ -49,7 +49,7 @@ class Expense extends Model
     public static function createExpense($data)
     {
         return self::create([
-            "user_id" => Auth::id(),
+            "user_id" => $data->user_id,
             "item_id" => $data->item_id,
             "amount" => $data->amount,
             "expense_date" => $data->date

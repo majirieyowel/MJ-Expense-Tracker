@@ -22,7 +22,6 @@ class GoogleAuthRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "client_id" => "required|string",
             "credential" => "required|string"
         ];
     }

@@ -3,8 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ItemController;
-use App\Http\Controllers\QueryController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\WhatsappController;
 use App\Http\Controllers\NotificationController;
 
 
@@ -15,8 +15,6 @@ Route::prefix('auth')
         Route::post('sign-in', 'signIn');
     });
 
-
-
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/auth/me', [AuthController::class, 'me']);
@@ -25,9 +23,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('expense')
         ->controller(ExpenseController::class)
         ->group(function () {
-
             Route::get('/', 'index');
             Route::get('top', 'topExpenses');
+            Route::get('summary', 'summary');
             Route::post('/', 'store');
             Route::delete('{expense_uuid}', 'destroy');
         });
@@ -36,17 +34,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('item')
         ->controller(ItemController::class)
         ->group(function () {
-
             Route::get('/', 'index');
             Route::post('merge', 'merge');
             Route::get('search', 'search');
-        });
-
-    // QUERY
-    Route::prefix('query')
-        ->controller(QueryController::class)
-        ->group(function () {
-            Route::get('summary', 'summary');
         });
 
     // NOTIFICATION
@@ -55,5 +45,15 @@ Route::middleware('auth:sanctum')->group(function () {
         ->group(function () {
             Route::get('/', 'index');
             Route::post('/', 'store');
+        });
+
+
+    // WHATSAPP
+    Route::prefix('whatsapp')
+        ->controller(WhatsappController::class)
+        ->group(function () {
+            Route::post('/setup', 'setup');
+            Route::post('/disconnect', 'disconnect');
+            Route::get('/check-message', 'checkWhatsappMessage');
         });
 });
