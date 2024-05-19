@@ -24,6 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
         ->controller(ExpenseController::class)
         ->group(function () {
             Route::get('/', 'index');
+            Route::get('/chart', 'expenseChart');
             Route::get('top', 'topExpenses');
             Route::get('summary', 'summary');
             Route::post('/', 'store');

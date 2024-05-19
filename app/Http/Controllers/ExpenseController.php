@@ -7,6 +7,7 @@ use App\Models\Expense;
 use Illuminate\Http\Request;
 use App\Services\ExpenseService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ExpenseRequest;
 
@@ -125,5 +126,32 @@ class ExpenseController extends Controller
         }
 
         return $sortedArray;
+    }
+
+    public function expenseChart(Request $request)
+    {
+        $year = $request->query('year', '2024');
+
+        $monthlyExpenses = Expense::select(DB::raw('MONTH(created_at) as month'), DB::raw('SUM(amount) as total'))
+            ->whereYear('created_at', $year)
+            ->groupBy(DB::raw('MONTH(created_at)'))
+            ->get();
+
+        $monthlyExpensesWithDefaults = [];
+
+        for ($i = 1; $i <= 12; $i++) {
+            $monthlyExpensesWithDefaults[$i] = 0;
+        }
+
+        // dd($monthlyExpensesWithDefaults);
+        
+        foreach ($monthlyExpenses as $expense) {
+            $monthlyExpensesWithDefaults[$expense->month] = floatval($expense->total);
+        }
+
+        $data['year'] = $year;
+        $data['dataset'] = [...$monthlyExpensesWithDefaults];
+
+        return $this->ok("Expense chart", $data);
     }
 }
