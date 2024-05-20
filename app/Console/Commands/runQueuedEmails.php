@@ -36,7 +36,7 @@ class RunQueuedEmails extends Command
             
             (new MailgunService())->send_with_template($data->template, json_decode($data->data, true));
 
-            // $email->delete();
+            $data->delete();
         }
     }
 }
