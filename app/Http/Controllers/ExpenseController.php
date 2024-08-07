@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Item;
 use App\Models\Expense;
 use Illuminate\Http\Request;
 use App\Services\ExpenseService;
@@ -142,8 +141,6 @@ class ExpenseController extends Controller
         for ($i = 1; $i <= 12; $i++) {
             $monthlyExpensesWithDefaults[$i] = 0;
         }
-
-        // dd($monthlyExpensesWithDefaults);
         
         foreach ($monthlyExpenses as $expense) {
             $monthlyExpensesWithDefaults[$expense->month] = floatval($expense->total);

@@ -15,9 +15,14 @@ Route::prefix('auth')
         Route::post('sign-in', 'signIn');
     });
 
+
+Route::post('/auth/verify-email', [AuthController::class, 'verifyEmail']);
+
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/auth/me', [AuthController::class, 'me']);
+
+    Route::post('/auth/resend-verify-email', [AuthController::class, 'resendEmailVerificationMail']);
 
     // EXPENSES
     Route::prefix('expense')

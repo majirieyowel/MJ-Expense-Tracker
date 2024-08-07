@@ -1,0 +1,53 @@
+services:
+    laravel:
+        build:
+            context: ./vendor/laravel/sail/runtimes/8.3
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: '${WWWGROUP}'
+        image: sail-8.3/app
+        container_name: "laravel"
+        ports:
+            - '${APP_PORT:-80}:80'
+        environment:
+            WWWUSER: '${WWWUSER}'
+            LARAVEL_SAIL: 1
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - spenda_network
+        depends_on:
+            - mysql
+            - redis
+    mysql:
+        image: 'mysql/mysql-server:8.0'
+        ports:
+            - '${FORWARD_DB_PORT:-3306}:3306'
+        container_name: mysql
+        environment:
+            # MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ROOT_HOST: '%'
+            MYSQL_DATABASE: 'spenda'
+            MYSQL_USER: 'spenda'
+            MYSQL_PASSWORD: '10?Aj_XV+Nng!R,n3r_t0KKUlG~pPmoD'
+            MYSQL_ALLOW_EMPTY_PASSWORD: 0
+        volumes:
+            - 'mysql-data:/var/lib/mysql'
+        networks:
+            - spenda_network
+
+    redis:
+        image: redis:latest
+        container_name: redis
+        volumes:
+            - redis-data:/data
+        networks:
+            - spenda_network
+networks:
+    spenda_network:
+        driver: bridge
+volumes:
+    mysql-data:
+        driver: local
+    redis-data:
+        driver: local

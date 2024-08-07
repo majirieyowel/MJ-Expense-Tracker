@@ -12,8 +12,10 @@ use App\Http\Requests\SignInRequest;
 use App\Http\Requests\SignUpRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
 use App\Http\Requests\GoogleAuthRequest;
+use App\Events\ResendEmailVerificationMail;
 
 class AuthController extends Controller
 {
@@ -102,6 +104,20 @@ class AuthController extends Controller
             report($th);
             return $this->error("Unable to sign in with google at this time", 400);
         }
+    }
+
+    public function resendVerificationMail(Request $request)
+    {
+
+        $user = User::getByEmail($request->email);
+
+        if (!$user) {
+            return $this->error("Email not found.", 401);
+        }
+
+        event(new ResendEmailVerificationMail($user));
+
+        return $this->ok("Email sent!", []);
     }
 
     private function signInUser(User $user)
