@@ -25,11 +25,10 @@ services:
             - '${FORWARD_DB_PORT:-3306}:3306'
         container_name: mysql
         environment:
-            # MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
             MYSQL_ROOT_HOST: '%'
-            MYSQL_DATABASE: 'spenda'
-            MYSQL_USER: 'spenda'
-            MYSQL_PASSWORD: '10?Aj_XV+Nng!R,n3r_t0KKUlG~pPmoD'
+            MYSQL_DATABASE: '${DB_DATABASE}'
+            MYSQL_USER: '${DB_USERNAME}'
+            MYSQL_PASSWORD: '${DB_PASSWORD}'
             MYSQL_ALLOW_EMPTY_PASSWORD: 0
         volumes:
             - 'mysql-data:/var/lib/mysql'
