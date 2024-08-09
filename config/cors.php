@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [env('FRONTEND_URL', 'https://spenda.ng')],
+    'allowed_origins' => [env('FRONTEND_URL', 'https://app.spenda.ng')],
 
     'allowed_origins_patterns' => [],
 
